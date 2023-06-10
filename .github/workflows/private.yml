@@ -14,6 +14,15 @@ jobs:
     if: github.event.action == 'closed' && github.event.pull_request.merged == true
     
     steps:
+      - name: Deploy to staging
+        uses: appleboy/ssh-action@master
+        with:
+          host: ec2-44-211-224-166.compute-1.amazonaws.com
+          username: ubuntu
+          key: ${{ secrets.SSH_PRI_KEY }}
+          script: |
+           whoami
+           pwd
 #       - name: SSH into private server via bastion host
 #         uses: appleboy/ssh-action@master
 #         with:
@@ -33,20 +42,21 @@ jobs:
 #             ls -l
 
 
-    - name: Install SSH client
-      run: sudo apt-get install openssh-client -y
+#     - name: Install SSH client
+#       run: sudo apt-get install openssh-client -y
       
-    - name: executing remote ssh to bastion host
-      env:
-        MY_SECRET: ${{secrets.SSH_PRI_KEY}}
-        SECRET_IP: ${{ secrets.SECRET_IP }} 
-      shell: bash
-      run: |
-        pwd
-        echo "$MY_SECRET" >> devops.pem && chmod 600 devops.pem
-        ls
-        eval `ssh-agent -s`
-        ssh-add devops.pem
-        ssh -tt -J ubuntu@ec2-44-211-224-166.compute-1.amazonaws.com -A -o "StrictHostKeyChecking=no" ubuntu@${{ env.SECRET_IP }} 
-        ls /var/www/
-        echo "connected!"
+      - name: executing remote ssh to bastion host
+        env:
+          MY_SECRET: ${{secrets.SSH_PRI_KEY}}
+          SECRET_IP: ${{ secrets.SECRET_IP }} 
+        shell: bash
+        run: |
+          pwd
+          echo "$MY_SECRET" >> devops.pem && chmod 600 devops.pem
+          ls
+          # eval `ssh-agent -s`
+          # ssh-add devops.pem
+          # ssh -tt -J ubuntu@ec2-44-211-224-166.compute-1.amazonaws.com -A -o "StrictHostKeyChecking=no" ubuntu@${{ env.SECRET_IP }} 
+          # ls /var/www/
+          ssh -i devops.pem -o "StrictHostKeyChecking=no" ubuntu@ec2-44-211-224-166.compute-1.amazonaws.com
+          echo "connected!"
