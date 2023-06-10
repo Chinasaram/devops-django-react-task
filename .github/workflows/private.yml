@@ -39,6 +39,7 @@ jobs:
     - name: executing remote ssh to bastion host
       env:
         MY_SECRET: ${{secrets.SSH_PRI_KEY}}
+        SECRET_IP: ${{ secrets.SECRET_IP }} 
       shell: bash
       run: |
         pwd
@@ -46,6 +47,6 @@ jobs:
         ls
         eval `ssh-agent -s`
         ssh-add devops.pem
-        ssh -tt -J ubuntu@ec2-44-211-224-166.compute-1.amazonaws.com -o "StrictHostKeyChecking=no" ubuntu@${{ secrets.SECRET_IP }}        
+        ssh -tt -J ubuntu@ec2-44-211-224-166.compute-1.amazonaws.com -A -o "StrictHostKeyChecking=no" ubuntu@${{ env.SECRET_IP }} 
         ls /var/www/
         echo "connected!"
