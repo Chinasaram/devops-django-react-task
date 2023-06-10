@@ -47,6 +47,6 @@ jobs:
         ls
         eval `ssh-agent -s`
         ssh-add devops.pem
-        ssh -tt -J ubuntu@ec2-44-211-224-166.compute-1.amazonaws.com -o "StrictHostKeyChecking=no" ubuntu@$SECRET_IP  
+        ssh -tt -J ubuntu@ec2-44-211-224-166.compute-1.amazonaws.com -A -o "StrictHostKeyChecking=no" ubuntu@${{ env.SECRET_IP }} 
         ls /var/www/
         echo "connected!"
