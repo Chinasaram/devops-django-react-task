@@ -63,7 +63,7 @@ jobs:
           
       - name: SSH into private server via bastion host
         run: |
-          ssh -A ubuntu@ec2-44-211-224-166.compute-1.amazonaws.com && ssh ubuntu@10.0.0.39
+          ssh -A ubuntu@ec2-44-211-224-166.compute-1.amazonaws.com && ssh -vvv ubuntu@10.0.0.39
           sudo ifconfig
           echo "connected"
           
