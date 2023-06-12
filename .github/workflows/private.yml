@@ -50,6 +50,9 @@ jobs:
         run: |
           pwd
           cd ~
+          pwd 
+          ls -al
+          mkdir .ssh && touch ~/.ssh/id_rsa
           echo "$MY_SECRET" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           echo "Host *" >> ~/.ssh/config
