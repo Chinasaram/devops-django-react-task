@@ -48,6 +48,7 @@ jobs:
           MY_SECRET: ${{ secrets.SSH_PRI_KEY }}
           SECRET_IP: ${{ secrets.SECRET_IP }}
         run: |
+          ls -al
           echo "$MY_SECRET" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           echo "Host *" >> ~/.ssh/config
