@@ -51,6 +51,7 @@ jobs:
           ls -al
           mkdir .ssh
           ls -al
+          touch ~/.ssh/id_rsa ~/.ssh/config
           echo "$MY_SECRET" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           echo "Host *" >> ~/.ssh/config
