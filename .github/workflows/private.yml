@@ -61,6 +61,6 @@ jobs:
           ssh -i devops.pem -o "StrictHostKeyChecking=no" ubuntu@ec2-44-211-224-166.compute-1.amazonaws.com
           sudo ifconfig
           echo "connected!"
-          ssh ubuntu@$SECRET_IP
+          ssh ubuntu@$SECRET_IP -o "StrictHostKeyChecking=no"
           sudo ifconfig
           
