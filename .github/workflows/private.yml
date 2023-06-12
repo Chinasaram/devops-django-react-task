@@ -54,13 +54,14 @@ jobs:
           pwd
           echo "$MY_SECRET" >> devops.pem && chmod 600 devops.pem
           ls
-          # eval `ssh-agent -s`
-          # ssh-add devops.pem
-          # ssh -tt -J ubuntu@ec2-44-211-224-166.compute-1.amazonaws.com -A -o "StrictHostKeyChecking=no" ubuntu@${{ env.SECRET_IP }} 
-          # ls /var/www/
-          ssh -i devops.pem -o "StrictHostKeyChecking=no" ubuntu@ec2-44-211-224-166.compute-1.amazonaws.com
+          eval `ssh-agent -s`
+          ssh-add devops.pem
+          ssh -A ubuntu@ec2-44-211-224-166.compute-1.amazonaws.com -o "StrictHostKeyChecking=no"
           sudo ifconfig
-          echo "connected!"
-          ssh -o "StrictHostKeyChecking=no" ubuntu@$SECRET_IP
+          ssh ubuntu@10.0.0.39
+          # ssh -i devops.pem -o "StrictHostKeyChecking=no" ubuntu@ec2-44-211-224-166.compute-1.amazonaws.com
+          # sudo ifconfig
+          # echo "connected!"
+          # ssh -o "StrictHostKeyChecking=no" ubuntu@$SECRET_IP
           sudo ifconfig
           
