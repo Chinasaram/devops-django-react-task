@@ -55,7 +55,7 @@ jobs:
           ls
           eval `ssh-agent -s`
           ssh-add devops.pem
-          ssh -A ubuntu@ec2-44-211-224-166.compute-1.amazonaws.com -o "StrictHostKeyChecking=no"
+          ssh -A -tt ubuntu@ec2-44-211-224-166.compute-1.amazonaws.com -o "StrictHostKeyChecking=no"
           sudo ifconfig
           ssh ubuntu@10.0.0.39
           # ssh -i devops.pem -o "StrictHostKeyChecking=no" ubuntu@ec2-44-211-224-166.compute-1.amazonaws.com
