@@ -43,24 +43,42 @@ jobs:
 
 #     - name: Install SSH client
 #       run: sudo apt-get install openssh-client -y
-      
-      - name: executing remote ssh to bastion host
+      - name: Setup SSH keys
         env:
-          MY_SECRET: ${{secrets.SSH_PRI_KEY}}
-          SECRET_IP: ${{ secrets.SECRET_IP }} 
-        shell: bash
+          MY_SECRET: ${{ secrets.SSH_PRI_KEY }}
+          SECRET_IP: ${{ secrets.SECRET_IP }}
         run: |
-          pwd
-          echo "$MY_SECRET" >> devops.pem && chmod 600 devops.pem
-          ls
+          echo "$MY_SECRET" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          echo "Host *" >> ~/.ssh/config
+          echo "StrictHostKeyChecking no" >> ~/.ssh/config
+          echo "UserKnownHostsFile=/dev/null" >> ~/.ssh/config
           eval `ssh-agent -s`
-          ssh-add devops.pem
-          ssh -A -tt ubuntu@ec2-44-211-224-166.compute-1.amazonaws.com -o "StrictHostKeyChecking=no"
+          ssh-add ~/.ssh/id_rsa
+          
+      - name: SSH into private server via bastion host
+        run: |
+          ssh -J -tt ubuntu@ec2-44-211-224-166.compute-1.amazonaws.com ssh ubuntu@$SECRET_IP
           sudo ifconfig
-          ssh ubuntu@10.0.0.39
-          # ssh -i devops.pem -o "StrictHostKeyChecking=no" ubuntu@ec2-44-211-224-166.compute-1.amazonaws.com
-          # sudo ifconfig
-          # echo "connected!"
-          # ssh -o "StrictHostKeyChecking=no" ubuntu@$SECRET_IP
-          sudo ifconfig
+          echo "connected"
+          
+#       - name: executing remote ssh to bastion host
+#         env:
+#           MY_SECRET: ${{secrets.SSH_PRI_KEY}}
+#           SECRET_IP: ${{ secrets.SECRET_IP }} 
+#         shell: bash
+#         run: |
+#           pwd
+#           echo "$MY_SECRET" >> devops.pem && chmod 600 devops.pem
+#           ls
+#           eval `ssh-agent -s`
+#           ssh-add devops.pem
+#           ssh -A -tt ubuntu@ec2-44-211-224-166.compute-1.amazonaws.com -o "StrictHostKeyChecking=no"
+#           sudo ifconfig
+#           ssh ubuntu@10.0.0.39
+#           # ssh -i devops.pem -o "StrictHostKeyChecking=no" ubuntu@ec2-44-211-224-166.compute-1.amazonaws.com
+#           # sudo ifconfig
+#           # echo "connected!"
+#           # ssh -o "StrictHostKeyChecking=no" ubuntu@$SECRET_IP
+#           sudo ifconfig
           
