@@ -48,14 +48,8 @@ jobs:
           MY_SECRET: ${{ secrets.SSH_PRI_KEY }}
           SECRET_IP: ${{ secrets.SECRET_IP }}
         run: |
-          ls -al
-          mkdir .ssh
-          ls -al
-          cd .ssh && touch id_rsa
-          touch config
-          ls
-          cd ..
-          ls -al .ssh
+          pwd
+          cd ~
           echo "$MY_SECRET" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           echo "Host *" >> ~/.ssh/config
