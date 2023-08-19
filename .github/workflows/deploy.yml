@@ -25,6 +25,8 @@ jobs:
         SLACK_USERNAME: Pipeline Notification
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         SLACK_FOOTER: Carbontech Notification
+        SHOW_REF: false
+        SHOW_ACTIONS_URL: false
 
   deploy_to_development:
     name: Deploy to EC2
@@ -40,7 +42,7 @@ jobs:
       with:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USERNAME }}
-        key: ${{ secrets.PRIVATE_KEY }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           cd devops-django-react-task
           git pull origin develop
@@ -63,11 +65,13 @@ jobs:
         SLACK_USERNAME: Pipeline Notification
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         SLACK_FOOTER: Carbontech Notification
+        SHOW_REF: false
+        SHOW_ACTIONS_URL: false
   
   notify_deployment_failure:
     runs-on: ubuntu-latest
     needs: deploy_to_development
-    if: ${{ needs.deploy_to_development.result == 'failure' }}
+    if: always() && ${{ needs.deploy_to_development.result == 'failure' }}
     steps:
     - uses: actions/checkout@v2
 
@@ -80,3 +84,5 @@ jobs:
         SLACK_USERNAME: Pipeline Notification
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         SLACK_FOOTER: Carbontech Notification
+        SHOW_REF: false
+        SHOW_ACTIONS_URL: false
