@@ -44,7 +44,7 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           cd devops-django-react-task
-          git pull origin develop
+          git pull origin main
           echo "successfully completed the pipeline"
 
     
@@ -69,7 +69,7 @@ jobs:
   notify_deployment_failure:
     runs-on: ubuntu-latest
     needs: deploy_to_development
-    if: failure() && ${{ needs.deploy_to_development.result == 'failure' }}
+    if: ${{ needs.deploy_to_development.result == 'failure' }}
     steps:
     - uses: actions/checkout@v2
 
