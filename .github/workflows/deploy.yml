@@ -2,37 +2,81 @@ name: Deploy to Ec2 Server via ssh
 
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
-  push:
-    branches: [ none ]
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - closed
     
-jobs:    
-  deploy:
+jobs:
+  notify_open_PR:
+    runs-on: ubuntu-latest
+    if: github.event.action == 'opened'
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Slack Notification
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
+        SLACK_MESSAGE: ${{ github.event.pull_request.title }}
+        SLACK_TITLE: 'This PR was opened by ${{ github.event.pull_request.user.login }} on dfs-web-repo and is ready for review :bell:'
+        SLACK_USERNAME: Pipeline Notification
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_FOOTER: Carbontech Notification
+
+  deploy_to_development:
     name: Deploy to EC2
     runs-on: ubuntu-latest
+    if: github.event.action == 'closed' && github.event.pull_request.merged == true
     
     steps:
     - name: checkout repo
       uses: actions/checkout@v3
-      
-#     - name: executing remote ssh commands using ssh key
-#       uses: webfactory/ssh-agent@v0.7.0
-#       with:
-#         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-        
-#     - name: testing scripts
-#       run: |
-#           pwd
-#           ls
-#           git clone -b main git@github.com:Chinasaram/devops-django-react-task.git
-#           whoami
-      
+
     - name: executing remote ssh commands using ssh key
-      uses: appleboy/ssh-action@master
+      uses: appleboy/ssh-action@v0.1.10
       with:
-        host: ${{ secrets.SSH_HOST }} 
+        host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        key: ${{ secrets.PRIVATE_KEY }}
         script: |
-          pwd
-          # git clone -b main git@github.com:Chinasaram/devops-django-react-task.git
-          whoami
+          cd devops-django-react-task
+          git pull origin develop
+          echo "successfully completed the pipeline"
+
+    
+  notify_deployment:
+    runs-on: ubuntu-latest
+    needs: deploy_to_development
+    if: ${{ needs.deploy_to_development.result == 'success' }}
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Slack Notification
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
+        SLACK_MESSAGE: ${{ github.event.pull_request.title }}
+        SLACK_TITLE: 'This PR was opened by ${{ github.event.pull_request.user.login }} on dfs-web-repo has been deployed :rocket:'
+        SLACK_USERNAME: Pipeline Notification
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_FOOTER: Carbontech Notification
+  
+  notify_deployment_failure:
+    runs-on: ubuntu-latest
+    needs: deploy_to_development
+    if: ${{ needs.deploy_to_development.result == 'failure' }}
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Slack Notification
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
+        SLACK_MESSAGE: ${{ github.event.pull_request.title }}
+        SLACK_TITLE: 'This PR opened by ${{ github.event.pull_request.user.login }} on dfs-web-repo failed not deployed :x:'
+        SLACK_USERNAME: Pipeline Notification
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_FOOTER: Carbontech Notification
