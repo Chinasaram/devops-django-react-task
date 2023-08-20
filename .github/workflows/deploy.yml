@@ -45,15 +45,7 @@ jobs:
           cd devops-django-react-task
           git pull origin main
           echo "successfully completed the pipeline"
-
-    
-  notify_deployment:
-    runs-on: ubuntu-latest
-    needs: deploy_to_development
-    if: ${{ needs.deploy_to_development.result == 'success' }}
-    steps:
-    - uses: actions/checkout@v2
-
+          
     - name: Slack Notification
       uses: rtCamp/action-slack-notify@v2
       env:
@@ -63,14 +55,7 @@ jobs:
         SLACK_USERNAME: Pipeline Notification
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         SLACK_FOOTER: Carbontech Notification
-      
-  
-  notify_deployment_failure:
-    runs-on: ubuntu-latest
-    needs: deploy_to_development
-    if: failure() && ${{ needs.deploy_to_development.result == 'failure' }}
-    steps:
-    - uses: actions/checkout@v2
+      if: success()
 
     - name: Slack Notification
       uses: rtCamp/action-slack-notify@v2
@@ -81,3 +66,4 @@ jobs:
         SLACK_USERNAME: Pipeline Notification
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         SLACK_FOOTER: Carbontech Notification
+      if: failure()
