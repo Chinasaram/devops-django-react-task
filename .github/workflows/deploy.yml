@@ -1,5 +1,4 @@
-name: Deploy to Ec2 Server via ssh
-
+name: Actions Pipeline for DFS
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   pull_request:
@@ -39,7 +38,7 @@ jobs:
     - name: executing remote ssh commands using ssh key
       uses: appleboy/ssh-action@v0.1.10
       with:
-        host: ${{ secrets.SSH_HOST }}
+        host: ${{ secrets.SH_HOST }}
         username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
@@ -59,8 +58,8 @@ jobs:
       uses: rtCamp/action-slack-notify@v2
       env:
         SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
-        SLACK_MESSAGE: ${{ github.event.pull_request.title }}
-        SLACK_TITLE: 'This PR was opened by ${{ github.event.pull_request.user.login }} on dfs-web-repo has been deployed :rocket:'
+        SLACK_MESSAGE: 'This PR was opened by ${{ github.event.pull_request.user.login }} on dfs-web-repo has been deployed :rocket:'
+        SLACK_TITLE: ${{ github.event.pull_request.title }}
         SLACK_USERNAME: Pipeline Notification
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         SLACK_FOOTER: Carbontech Notification
@@ -69,7 +68,7 @@ jobs:
   notify_deployment_failure:
     runs-on: ubuntu-latest
     needs: deploy_to_development
-    if: ${{ needs.deploy_to_development.result == 'failure' }}
+    if: failure() && ${{ needs.deploy_to_development.result == 'failure' }}
     steps:
     - uses: actions/checkout@v2
 
