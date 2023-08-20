@@ -38,7 +38,7 @@ jobs:
     - name: executing remote ssh commands using ssh key
       uses: appleboy/ssh-action@v0.1.10
       with:
-        host: ${{ secrets.SH_HOST }}
+        host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
@@ -62,7 +62,7 @@ jobs:
       env:
         SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
         SLACK_MESSAGE: ${{ github.event.pull_request.title }}
-        SLACK_TITLE: 'This PR opened by ${{ github.event.pull_request.user.login }} on dfs-web-repo failed not deployed :x:'
+        SLACK_TITLE: 'This PR opened by ${{ github.event.pull_request.user.login }} on dfs-web-repo was not deployed :x:'
         SLACK_USERNAME: Pipeline Notification
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         SLACK_FOOTER: Carbontech Notification
